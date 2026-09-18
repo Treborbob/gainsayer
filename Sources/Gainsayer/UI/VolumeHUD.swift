@@ -90,9 +90,15 @@ final class VolumeHUD {
 
         var body: some View {
             VStack(alignment: .leading, spacing: 10) {
-                Text(model.device)
-                    .font(.system(size: 15, weight: .semibold))
-                    .lineLimit(1)
+                HStack {
+                    Text(model.device)
+                        .font(.system(size: 15, weight: .semibold))
+                        .lineLimit(1)
+                    Spacer()
+                    // Gains. Our signature, so the two bezels are never confused.
+                    Text("\u{1F4AA}")
+                        .font(.system(size: 14))
+                }
 
                 HStack(spacing: 10) {
                     Image(systemName: model.muted ? "speaker.slash.fill" : "speaker.fill")
