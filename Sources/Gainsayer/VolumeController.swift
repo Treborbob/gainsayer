@@ -45,7 +45,7 @@ final class VolumeController: ObservableObject {
                 case .volumeDown: self.stepVolume(by: -step)
                 case .mute: self.toggleMute()
                 }
-                self.hud.show(level: self.volume, muted: self.isMuted || self.volume == 0)
+                self.hud.show(device: self.deviceName, level: self.volume, muted: self.isMuted || self.volume == 0)
             }
         }
 

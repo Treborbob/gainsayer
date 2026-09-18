@@ -1,24 +1,26 @@
 import AppKit
 import SwiftUI
 
-/// The floating volume bezel shown near the top-right of the screen when a volume key is pressed,
-/// standing in for the system one that macOS does not show for devices it cannot control.
+/// The floating volume bezel shown under the menu bar on the right when a volume key is pressed.
+/// Styled after the macOS 26 system bezel, which for these devices only shows a greyed-out slider.
 @MainActor
 final class VolumeHUD {
     private final class Model: ObservableObject {
+        @Published var device = ""
         @Published var level: Float = 0
         @Published var muted = false
     }
 
-    private static let size = NSSize(width: 220, height: 44)
-    private static let margin = NSPoint(x: 12, y: 8)
+    private static let size = NSSize(width: 290, height: 62)
+    private static let margin = NSPoint(x: 12, y: 10)
     private static let holdDuration: TimeInterval = 1.5
 
     private let model = Model()
     private var panel: NSPanel?
     private var hideTimer: Timer?
 
-    func show(level: Float, muted: Bool) {
+    func show(device: String, level: Float, muted: Bool) {
+        model.device = device
         model.level = level
         model.muted = muted
 
@@ -83,36 +85,61 @@ final class VolumeHUD {
     private struct HUDView: View {
         @ObservedObject var model: Model
 
-        var body: some View {
-            HStack(spacing: 12) {
-                Image(systemName: model.muted ? "speaker.slash.fill" : symbol)
-                    .font(.system(size: 16, weight: .medium))
-                    .frame(width: 22)
-                    .foregroundStyle(.primary)
+        private let tickCount = 16
+        private let trackHeight: CGFloat = 5
 
+        var body: some View {
+            VStack(alignment: .leading, spacing: 10) {
+                Text(model.device)
+                    .font(.system(size: 15, weight: .semibold))
+                    .lineLimit(1)
+
+                HStack(spacing: 10) {
+                    Image(systemName: model.muted ? "speaker.slash.fill" : "speaker.fill")
+                        .font(.system(size: 12, weight: .semibold))
+                        .frame(width: 16)
+
+                    track
+
+                    Image(systemName: "speaker.wave.3.fill")
+                        .font(.system(size: 12, weight: .semibold))
+                        .frame(width: 20)
+                }
+                .foregroundStyle(.primary)
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
+            .frame(width: VolumeHUD.size.width, height: VolumeHUD.size.height, alignment: .leading)
+            .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 20, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: 20, style: .continuous)
+                    .strokeBorder(.primary.opacity(0.12), lineWidth: 1)
+            )
+        }
+
+        private var track: some View {
+            VStack(spacing: 5) {
                 GeometryReader { proxy in
                     ZStack(alignment: .leading) {
-                        Capsule().fill(.primary.opacity(0.18))
+                        Capsule().fill(.primary.opacity(0.2))
                         Capsule()
                             .fill(.primary)
                             .frame(width: proxy.size.width * CGFloat(model.muted ? 0 : model.level))
                     }
                 }
-                .frame(height: 6)
+                .frame(height: trackHeight)
                 .animation(.easeOut(duration: 0.12), value: model.level)
                 .animation(.easeOut(duration: 0.12), value: model.muted)
-            }
-            .padding(.horizontal, 16)
-            .frame(width: VolumeHUD.size.width, height: VolumeHUD.size.height)
-            .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
-        }
 
-        private var symbol: String {
-            switch model.level {
-            case 0: "speaker.fill"
-            case ..<0.34: "speaker.wave.1.fill"
-            case ..<0.67: "speaker.wave.2.fill"
-            default: "speaker.wave.3.fill"
+                HStack(spacing: 0) {
+                    ForEach(0..<tickCount, id: \.self) { index in
+                        Circle()
+                            .fill(.primary.opacity(0.35))
+                            .frame(width: 2, height: 2)
+                        if index < tickCount - 1 { Spacer(minLength: 0) }
+                    }
+                }
+                .padding(.horizontal, 2)
             }
         }
     }
