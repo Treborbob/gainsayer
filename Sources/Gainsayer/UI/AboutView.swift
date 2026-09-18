@@ -32,22 +32,17 @@ struct AboutView: View {
                     .foregroundStyle(.secondary)
             }
 
-            Text("A volume control for the outputs macOS won't let you adjust.")
+            Text("Volume for the outputs macOS won't let you adjust.")
                 .font(.headline)
-                .multilineTextAlignment(.center)
 
             Text(
                 """
-                When your Mac plays over HDMI or optical, the volume keys stop working because the \
-                device has no level control of its own. Gainsayer steps into the signal path for \
-                exactly those devices and gives you back a slider, the keyboard keys and mute. \
-                Everywhere else it stays out of the way.
+                Over HDMI or optical the volume keys go dead, because the device has no level control. \
+                Gainsayer steps in for exactly those devices and hands you back the slider, the keys and mute.
                 """
             )
             .font(.callout)
             .foregroundStyle(.secondary)
-            .multilineTextAlignment(.center)
-            .fixedSize(horizontal: false, vertical: true)
 
             HStack(spacing: 18) {
                 Link("Source on GitHub", destination: Self.repository)
@@ -60,21 +55,18 @@ struct AboutView: View {
                 .padding(.horizontal, 40)
 
             VStack(spacing: 4) {
-                Text("Built on Core Audio process taps, no drivers or extensions.")
-                HStack(spacing: 4) {
-                    Text("Thanks to")
-                    Link("AudioCap", destination: Self.audioCap)
-                    Text("for the worked example. Made with")
-                    Link("Claude Code", destination: Self.claudeCode)
-                    Text(".")
-                }
-                Text("A gainsayer contradicts. This one contradicts macOS about whether HDMI has a volume.")
+                Text(
+                    "Core Audio process taps, no drivers. Thanks to [AudioCap](\(Self.audioCap)) for the "
+                        + "worked example. Made with [Claude Code](\(Self.claudeCode))."
+                )
+                Text("A gainsayer contradicts. This one contradicts macOS about HDMI having a volume.")
                     .italic()
             }
             .font(.caption)
             .foregroundStyle(.secondary)
-            .multilineTextAlignment(.center)
         }
+        .multilineTextAlignment(.center)
+        .fixedSize(horizontal: false, vertical: true)
         .padding(.horizontal, 28)
         .padding(.top, 20)
         .padding(.bottom, 24)
