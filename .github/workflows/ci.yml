@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    name: Lint, test, build
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Toolchain
+        run: |
+          xcodebuild -version
+          swift --version
+
+      - name: Lint
+        run: swift format lint --strict --recursive Sources Tests Package.swift
+
+      - name: Test
+        run: swift test
+
+      - name: Build app bundle
+        run: scripts/build-app.sh
+
+      - name: Package
+        run: ditto -c -k --keepParent build/Gainsayer.app build/Gainsayer.zip
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Gainsayer.app
+          path: build/Gainsayer.zip
+          if-no-files-found: error

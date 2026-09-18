@@ -43,12 +43,14 @@ final class VolumeHUD {
 
     private func hide() {
         guard let panel else { return }
-        NSAnimationContext.runAnimationGroup({ context in
-            context.duration = 0.25
-            panel.animator().alphaValue = 0
-        }, completionHandler: {
-            if panel.alphaValue == 0 { panel.orderOut(nil) }
-        })
+        NSAnimationContext.runAnimationGroup(
+            { context in
+                context.duration = 0.25
+                panel.animator().alphaValue = 0
+            },
+            completionHandler: {
+                if panel.alphaValue == 0 { panel.orderOut(nil) }
+            })
     }
 
     private func makePanel() -> NSPanel {

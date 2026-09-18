@@ -20,6 +20,7 @@ rm -rf "$OUT"
 mkdir -p "$OUT/Contents/MacOS" "$OUT/Contents/Resources"
 cp "$BIN" "$OUT/Contents/MacOS/$NAME"
 cp Support/Info.plist "$OUT/Contents/Info.plist"
+cp Support/AppIcon.icns "$OUT/Contents/Resources/AppIcon.icns"
 printf 'APPL????' > "$OUT/Contents/PkgInfo"
 
 IDENTITY=${SIGN_IDENTITY:-}

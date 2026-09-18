@@ -59,10 +59,13 @@ struct MenuView: View {
 
             Divider()
 
-            Toggle("Launch at login", isOn: Binding(
-                get: { controller.launchAtLogin },
-                set: { controller.setLaunchAtLogin($0) }
-            ))
+            Toggle(
+                "Launch at login",
+                isOn: Binding(
+                    get: { controller.launchAtLogin },
+                    set: { controller.setLaunchAtLogin($0) }
+                )
+            )
             .toggleStyle(.checkbox)
 
             Button("Quit Gainsayer") {

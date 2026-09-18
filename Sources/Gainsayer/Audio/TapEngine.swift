@@ -101,13 +101,13 @@ final class TapEngine {
             kAudioAggregateDeviceIsStackedKey: false,
             kAudioAggregateDeviceMainSubDeviceKey: outputUID,
             kAudioAggregateDeviceSubDeviceListKey: [
-                [kAudioSubDeviceUIDKey: outputUID],
+                [kAudioSubDeviceUIDKey: outputUID]
             ],
             kAudioAggregateDeviceTapListKey: [
                 [
                     kAudioSubTapUIDKey: tapUUID.uuidString,
                     kAudioSubTapDriftCompensationKey: true,
-                ],
+                ]
             ],
             kAudioAggregateDeviceTapAutoStartKey: true,
         ]
@@ -118,7 +118,8 @@ final class TapEngine {
 
     private func startIO() throws {
         var procID: AudioDeviceIOProcID?
-        let status = AudioDeviceCreateIOProcIDWithBlock(&procID, aggregateID, ioQueue) { [unowned self] _, input, _, output, _ in
+        let status = AudioDeviceCreateIOProcIDWithBlock(&procID, aggregateID, ioQueue) {
+            [unowned self] _, input, _, output, _ in
             self.render(input: input, output: output)
         }
         try check(status, "Creating the IO callback")
@@ -142,14 +143,16 @@ final class TapEngine {
 
         // Fast path: identical buffer layout on both sides. This is the expected case for a stereo tap
         // feeding a stereo device.
-        let sameLayout = inBuffers.count == outBuffers.count
+        let sameLayout =
+            inBuffers.count == outBuffers.count
             && zip(inBuffers, outBuffers).allSatisfy { $0.mNumberChannels == $1.mNumberChannels }
         if sameLayout {
             for (i, o) in zip(inBuffers, outBuffers) {
                 guard let ip = i.mData, let op = o.mData else { continue }
                 let count = min(Int(i.mDataByteSize), Int(o.mDataByteSize)) / MemoryLayout<Float>.size
-                vDSP_vsmul(ip.assumingMemoryBound(to: Float.self), 1, &gain,
-                           op.assumingMemoryBound(to: Float.self), 1, vDSP_Length(count))
+                vDSP_vsmul(
+                    ip.assumingMemoryBound(to: Float.self), 1, &gain,
+                    op.assumingMemoryBound(to: Float.self), 1, vDSP_Length(count))
             }
             return
         }

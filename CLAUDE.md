@@ -22,14 +22,21 @@ scaling it, and playing it back out. Personal project, single user, no App Store
 - `Sources/Gainsayer/Input/MediaKeyMonitor.swift`: CGEventTap for the volume keys.
 - `Sources/Gainsayer/VolumeController.swift`: state, device tracking, engage/disengage.
 - `Sources/Gainsayer/UI/`: SwiftUI menu bar UI and the floating volume HUD.
-- `Support/Info.plist`: bundle metadata and the audio capture usage string.
+- `Tests/GainsayerTests/`: Swift Testing unit tests for the pure parts (taper, error formatting).
+- `Support/`: Info.plist, app icon. Regenerate the icon with `swift scripts/make-icon.swift`.
 - `scripts/build-app.sh`: assembles and signs `build/Gainsayer.app`.
+- `.github/workflows/ci.yml`: lint, test and bundle build on `macos-26`.
 
 ## Commands
 
 - `swift build` compiles. `make app` builds the bundle. `make run` builds and launches.
-- There are no automated tests. The audio path can only be verified against real hardware with the
-  HDMI device as the default output. Say so plainly rather than claiming it works.
+- `make check` runs `swift format lint --strict` and `swift test`. Run it before committing; CI
+  fails on either. `make format` rewrites sources to the `.swift-format` style (4 spaces, 120 cols).
+- Unit tests cover only the pure parts. The audio path can only be verified against real hardware
+  with the HDMI device as the default output. Say so plainly rather than claiming it works.
+- Never run the bare binary from `.build/`: it is the app without its bundle, and it will start a
+  second instance whose permission prompts get attributed to the wrong app. Use `make run`.
+- Use `/usr/bin/log`, not `log`: zsh has a builtin of that name.
 
 ## Testing checklist for audio changes
 

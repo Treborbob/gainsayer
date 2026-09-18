@@ -72,8 +72,11 @@ enum AudioSystem {
     // MARK: Devices
 
     static func defaultOutputDevice() -> AudioObjectID? {
-        guard let id: AudioObjectID = get(systemObject, kAudioHardwarePropertyDefaultOutputDevice, default: kAudioObjectUnknown),
-              id != kAudioObjectUnknown else { return nil }
+        guard
+            let id: AudioObjectID = get(
+                systemObject, kAudioHardwarePropertyDefaultOutputDevice, default: kAudioObjectUnknown),
+            id != kAudioObjectUnknown
+        else { return nil }
         return id
     }
 
@@ -89,7 +92,8 @@ enum AudioSystem {
     static func hasOutputVolumeControl(_ device: AudioObjectID) -> Bool {
         let elements: [AudioObjectPropertyElement] = [kAudioObjectPropertyElementMain, 1, 2]
         return elements.contains { element in
-            var addr = address(kAudioDevicePropertyVolumeScalar, scope: kAudioObjectPropertyScopeOutput, element: element)
+            var addr = address(
+                kAudioDevicePropertyVolumeScalar, scope: kAudioObjectPropertyScopeOutput, element: element)
             return AudioObjectHasProperty(device, &addr)
         }
     }
@@ -100,7 +104,8 @@ enum AudioSystem {
         var addr = address(kAudioHardwarePropertyTranslatePIDToProcessObject)
         var object = AudioObjectID(kAudioObjectUnknown)
         var size = UInt32(MemoryLayout<AudioObjectID>.size)
-        let status = AudioObjectGetPropertyData(systemObject, &addr, UInt32(MemoryLayout<pid_t>.size), &pid, &size, &object)
+        let status = AudioObjectGetPropertyData(
+            systemObject, &addr, UInt32(MemoryLayout<pid_t>.size), &pid, &size, &object)
         return status == noErr && object != kAudioObjectUnknown ? object : nil
     }
 
@@ -113,7 +118,10 @@ enum AudioSystem {
         private let queue: DispatchQueue
         private let block: AudioObjectPropertyListenerBlock
 
-        fileprivate init(object: AudioObjectID, addr: AudioObjectPropertyAddress, queue: DispatchQueue, block: @escaping AudioObjectPropertyListenerBlock) {
+        fileprivate init(
+            object: AudioObjectID, addr: AudioObjectPropertyAddress, queue: DispatchQueue,
+            block: @escaping AudioObjectPropertyListenerBlock
+        ) {
             self.object = object
             self.addr = addr
             self.queue = queue

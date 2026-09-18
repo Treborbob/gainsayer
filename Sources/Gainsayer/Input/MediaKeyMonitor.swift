@@ -21,8 +21,8 @@ final class MediaKeyMonitor {
     private var port: CFMachPort?
     private var source: CFRunLoopSource?
 
-    private static let systemDefinedEventType = CGEventType(rawValue: 14)! // NX_SYSDEFINED
-    private static let auxControlSubtype = 8                                // NX_SUBTYPE_AUX_CONTROL_BUTTONS
+    private static let systemDefinedEventType = CGEventType(rawValue: 14)!  // NX_SYSDEFINED
+    private static let auxControlSubtype = 8  // NX_SUBTYPE_AUX_CONTROL_BUTTONS
 
     var isRunning: Bool { port != nil }
 
@@ -41,14 +41,16 @@ final class MediaKeyMonitor {
             let monitor = Unmanaged<MediaKeyMonitor>.fromOpaque(refcon).takeUnretainedValue()
             return monitor.handle(type: type, event: event)
         }
-        guard let port = CGEvent.tapCreate(
-            tap: .cgSessionEventTap,
-            place: .headInsertEventTap,
-            options: .defaultTap,
-            eventsOfInterest: mask,
-            callback: callback,
-            userInfo: Unmanaged.passUnretained(self).toOpaque()
-        ) else { return false }
+        guard
+            let port = CGEvent.tapCreate(
+                tap: .cgSessionEventTap,
+                place: .headInsertEventTap,
+                options: .defaultTap,
+                eventsOfInterest: mask,
+                callback: callback,
+                userInfo: Unmanaged.passUnretained(self).toOpaque()
+            )
+        else { return false }
 
         let source = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, port, 0)
         CFRunLoopAddSource(CFRunLoopGetMain(), source, .commonModes)
@@ -75,8 +77,9 @@ final class MediaKeyMonitor {
         }
 
         guard type == Self.systemDefinedEventType,
-              let nsEvent = NSEvent(cgEvent: event),
-              nsEvent.subtype.rawValue == Self.auxControlSubtype else { return passThrough }
+            let nsEvent = NSEvent(cgEvent: event),
+            nsEvent.subtype.rawValue == Self.auxControlSubtype
+        else { return passThrough }
 
         let data = nsEvent.data1
         let keyCode = (data & 0xFFFF_0000) >> 16
@@ -85,9 +88,9 @@ final class MediaKeyMonitor {
 
         let key: Key
         switch keyCode {
-        case 0: key = .volumeUp    // NX_KEYTYPE_SOUND_UP
+        case 0: key = .volumeUp  // NX_KEYTYPE_SOUND_UP
         case 1: key = .volumeDown  // NX_KEYTYPE_SOUND_DOWN
-        case 7: key = .mute        // NX_KEYTYPE_MUTE
+        case 7: key = .mute  // NX_KEYTYPE_MUTE
         default: return passThrough
         }
 
@@ -96,6 +99,6 @@ final class MediaKeyMonitor {
             let fine = nsEvent.modifierFlags.isSuperset(of: [.shift, .option])
             onKey(key, fine)
         }
-        return nil // swallow both down and up so macOS does not also act on it
+        return nil  // swallow both down and up so macOS does not also act on it
     }
 }
