@@ -46,6 +46,9 @@ make run        # builds and launches it
 make install    # builds, copies to /Applications, launches
 ```
 
+Use `make install` for day-to-day use. The "Launch at login" toggle in the menu registers the app at
+its current path, so register it from `/Applications`, not from the build folder.
+
 ### Code signing (do this once)
 
 macOS ties an app's permissions to its code signature. Ad-hoc signatures change on every build, so
@@ -61,7 +64,7 @@ The build script picks it up automatically. To use a different identity, set `SI
 
 - [x] First run against real hardware and confirm the audio path
 - [x] Volume bezel HUD to match the system one
-- [ ] Launch at login
+- [x] Launch at login
 - [ ] Homebrew tap for install and updates
 
 ## Troubleshooting

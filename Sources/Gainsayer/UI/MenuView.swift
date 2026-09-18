@@ -59,6 +59,12 @@ struct MenuView: View {
 
             Divider()
 
+            Toggle("Launch at login", isOn: Binding(
+                get: { controller.launchAtLogin },
+                set: { controller.setLaunchAtLogin($0) }
+            ))
+            .toggleStyle(.checkbox)
+
             Button("Quit Gainsayer") {
                 NSApplication.shared.terminate(nil)
             }

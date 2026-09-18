@@ -2,6 +2,7 @@ import AppKit
 import Combine
 import CoreAudio
 import Foundation
+import ServiceManagement
 
 /// Owns the app's state: which device is current, whether we are managing it, and the user's volume.
 @MainActor
@@ -13,6 +14,7 @@ final class VolumeController: ObservableObject {
     @Published private(set) var isEngaged = false
     @Published private(set) var deviceName = "No output device"
     @Published private(set) var accessibilityGranted = false
+    @Published private(set) var launchAtLogin = false
     @Published private(set) var lastError: String?
 
     /// Keyboard step. macOS uses 16 steps; we use 32 for finer control over a fixed-gain amp chain.
@@ -64,8 +66,27 @@ final class VolumeController: ObservableObject {
             MainActor.assumeIsolated { self?.disengage() }
         }
 
+        launchAtLogin = SMAppService.mainApp.status == .enabled
         startKeyMonitor(prompt: true)
         evaluate()
+    }
+
+    // MARK: Login item
+
+    /// Registers this bundle, at its current path, as a login item. Move the app and you must re-toggle.
+    func setLaunchAtLogin(_ enabled: Bool) {
+        do {
+            if enabled {
+                try SMAppService.mainApp.register()
+            } else {
+                try SMAppService.mainApp.unregister()
+            }
+            lastError = nil
+        } catch {
+            lastError = "Launch at login: \(error.localizedDescription)"
+            Log.app.error("Launch at login change failed: \(error.localizedDescription, privacy: .public)")
+        }
+        launchAtLogin = SMAppService.mainApp.status == .enabled
     }
 
     // MARK: Device tracking
