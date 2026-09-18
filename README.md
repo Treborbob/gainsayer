@@ -85,3 +85,9 @@ tccutil reset Accessibility dev.robblack.gainsayer
 ```
 
 Use the full path: zsh has a builtin named `log` that will silently swallow the command otherwise.
+
+## Status and licence
+
+This is a personal tool, built for one machine and one audio setup. It is public so people can read
+it, fork it, and do what they like with it under the MIT licence, but it is not looking for
+contributions and issues may go unanswered.
