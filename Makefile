@@ -7,6 +7,7 @@ app:
 	scripts/build-app.sh
 
 run: app
+	pkill -x Gainsayer || true
 	open build/Gainsayer.app
 
 install: app
