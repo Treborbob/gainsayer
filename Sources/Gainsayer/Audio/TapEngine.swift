@@ -43,13 +43,13 @@ final class TapEngine {
     func start(outputDevice: AudioObjectID) throws {
         stop()
         guard let outputUID = AudioSystem.uid(of: outputDevice) else { throw EngineError.noDeviceUID }
-        Log.audio.info("Starting engine for device \(outputDevice) uid=\(outputUID, privacy: .public)")
+        Log.audio.notice("Starting engine for device \(outputDevice) uid=\(outputUID, privacy: .public)")
         do {
             try createTap()
             try createAggregate(outputUID: outputUID)
             try startIO()
             isRunning = true
-            Log.audio.info("Engine running: tap=\(self.tapID) aggregate=\(self.aggregateID)")
+            Log.audio.notice("Engine running: tap=\(self.tapID) aggregate=\(self.aggregateID)")
         } catch {
             Log.audio.error("Engine start failed: \(error.localizedDescription, privacy: .public)")
             stop()
@@ -58,7 +58,7 @@ final class TapEngine {
     }
 
     func stop() {
-        if isRunning { Log.audio.info("Stopping engine") }
+        if isRunning { Log.audio.notice("Stopping engine") }
         if let ioProcID {
             AudioDeviceStop(aggregateID, ioProcID)
             AudioDeviceDestroyIOProcID(aggregateID, ioProcID)

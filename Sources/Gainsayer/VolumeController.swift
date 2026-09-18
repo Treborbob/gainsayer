@@ -79,7 +79,7 @@ final class VolumeController: ObservableObject {
         }
         deviceName = AudioSystem.name(of: device)
         let needsUs = !AudioSystem.hasOutputVolumeControl(device)
-        Log.app.info("Default output is \(device) \(self.deviceName, privacy: .public); needs Gainsayer: \(needsUs)")
+        Log.app.notice("Default output is \(device) \(self.deviceName, privacy: .public); needs Gainsayer: \(needsUs)")
 
         if needsUs {
             if engagedDevice != device { engage(device) }
@@ -103,7 +103,7 @@ final class VolumeController: ObservableObject {
     }
 
     private func disengage() {
-        if isEngaged { Log.app.info("Disengaging") }
+        if isEngaged { Log.app.notice("Disengaging") }
         engine.stop()
         engagedDevice = nil
         isEngaged = false
@@ -148,14 +148,14 @@ final class VolumeController: ObservableObject {
     private func startKeyMonitor(prompt: Bool) {
         accessibilityGranted = MediaKeyMonitor.isTrusted(prompt: prompt)
         if accessibilityGranted, keys.start() {
-            Log.keys.info("Media key monitor running")
+            Log.keys.notice("Media key monitor running")
             accessibilityRetry?.invalidate()
             accessibilityRetry = nil
             return
         }
         // Not granted yet. Poll quietly until the user flips the switch in System Settings.
         if accessibilityRetry == nil {
-            Log.keys.info("Accessibility not granted (trusted=\(self.accessibilityGranted)); will retry")
+            Log.keys.notice("Accessibility not granted (trusted=\(self.accessibilityGranted)); will retry")
             accessibilityRetry = Timer.scheduledTimer(withTimeInterval: 3, repeats: true) { [weak self] _ in
                 MainActor.assumeIsolated { self?.startKeyMonitor(prompt: false) }
             }
