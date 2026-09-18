@@ -63,3 +63,22 @@ The build script picks it up automatically. To use a different identity, set `SI
 - [x] Volume bezel HUD to match the system one
 - [ ] Launch at login
 - [ ] Homebrew tap for install and updates
+
+## Troubleshooting
+
+**The volume keys stopped working after a rebuild, and Accessibility shows Gainsayer as ticked.**
+macOS keys the grant on the app's code signature. If the signature changed (for example from an
+ad-hoc build to the certificate, or if a bare debug binary was run), the ticked row is stale and the
+running app is still untrusted. Reset the record and grant it again:
+
+```bash
+tccutil reset Accessibility dev.robblack.gainsayer
+```
+
+**Reading the log.** State changes are logged at notice level:
+
+```bash
+/usr/bin/log show --last 10m --predicate 'subsystem == "dev.robblack.gainsayer"' --style compact
+```
+
+Use the full path: zsh has a builtin named `log` that will silently swallow the command otherwise.
