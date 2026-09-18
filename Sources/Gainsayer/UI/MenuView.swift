@@ -46,9 +46,15 @@ struct MenuView: View {
             }
 
             if !controller.accessibilityGranted {
-                Text("Grant Accessibility access in System Settings to use the keyboard volume keys.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("The keyboard volume keys need Accessibility access.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    Button("Open Accessibility Settings") {
+                        controller.openAccessibilitySettings()
+                    }
+                    .controlSize(.small)
+                }
             }
 
             Divider()

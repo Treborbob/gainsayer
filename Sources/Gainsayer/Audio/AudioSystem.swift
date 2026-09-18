@@ -44,7 +44,7 @@ enum AudioSystem {
     }
 
     /// Reads a fixed-size property value. Returns nil if the property is absent or the read fails.
-    static func get<T>(
+    static func get<T: BitwiseCopyable>(
         _ object: AudioObjectID,
         _ selector: AudioObjectPropertySelector,
         scope: AudioObjectPropertyScope = kAudioObjectPropertyScopeGlobal,
