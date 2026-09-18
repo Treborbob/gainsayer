@@ -3,6 +3,8 @@
 #
 # Signing: set SIGN_IDENTITY to a code-signing identity in your keychain. If unset, a self-signed
 # certificate named "Gainsayer Dev" is used when present, otherwise the build is ad-hoc signed.
+# The certificate does not need to be trusted: codesign accepts it, and macOS keys permissions on
+# the certificate hash, which is all we need.
 # Ad-hoc signatures change on every build, which makes macOS forget the app's permissions.
 set -euo pipefail
 cd "$(dirname "$0")/.."
@@ -21,7 +23,7 @@ cp Support/Info.plist "$OUT/Contents/Info.plist"
 printf 'APPL????' > "$OUT/Contents/PkgInfo"
 
 IDENTITY=${SIGN_IDENTITY:-}
-if [[ -z "$IDENTITY" ]] && security find-identity -v -p codesigning 2>/dev/null | grep -q '"Gainsayer Dev"'; then
+if [[ -z "$IDENTITY" ]] && security find-identity -p codesigning 2>/dev/null | grep -q '"Gainsayer Dev"'; then
     IDENTITY="Gainsayer Dev"
 fi
 if [[ -z "$IDENTITY" ]]; then

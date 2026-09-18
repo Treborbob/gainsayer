@@ -15,13 +15,16 @@ final class VolumeController: ObservableObject {
     @Published private(set) var accessibilityGranted = false
     @Published private(set) var lastError: String?
 
-    static let step: Float = 1.0 / 16.0
+    /// Keyboard step. macOS uses 16 steps; we use 32 for finer control over a fixed-gain amp chain.
+    static let step: Float = 1.0 / 32.0
     private static let volumeKey = "volume"
-    /// Range of the volume control in decibels. 0 on the slider is silence; 1 is unity.
-    private static let rangeDB: Float = 60
+    /// Exponent of the volume taper. 3 is the common "cubic" taper: 50% is about -18 dB, 25% about
+    /// -36 dB. Lower it towards 2 for a louder mid-range, raise it for more resolution at the top.
+    private static let taper: Float = 3
 
     private let engine = TapEngine()
     private let keys = MediaKeyMonitor()
+    private let hud = VolumeHUD()
     private var listeners: [AudioSystem.ListenerToken] = []
     private var engagedDevice: AudioObjectID?
     private var accessibilityRetry: Timer?
@@ -33,13 +36,16 @@ final class VolumeController: ObservableObject {
         keys.shouldIntercept = { [weak self] in
             MainActor.assumeIsolated { self?.isEngaged ?? false }
         }
-        keys.onKey = { [weak self] key in
+        keys.onKey = { [weak self] key, fine in
             MainActor.assumeIsolated {
+                guard let self else { return }
+                let step = fine ? Self.step / 4 : Self.step
                 switch key {
-                case .volumeUp: self?.stepVolume(by: Self.step)
-                case .volumeDown: self?.stepVolume(by: -Self.step)
-                case .mute: self?.toggleMute()
+                case .volumeUp: self.stepVolume(by: step)
+                case .volumeDown: self.stepVolume(by: -step)
+                case .mute: self.toggleMute()
                 }
+                self.hud.show(level: self.volume, muted: self.isMuted || self.volume == 0)
             }
         }
 
@@ -114,8 +120,9 @@ final class VolumeController: ObservableObject {
     }
 
     func stepVolume(by delta: Float) {
-        // Snap to the step grid so keyboard and slider agree with each other.
-        let snapped = (volume / Self.step).rounded() * Self.step
+        // Snap to the grid of the step being taken so keyboard and slider agree with each other.
+        let grid = abs(delta)
+        let snapped = (volume / grid).rounded() * grid
         setVolume(snapped + delta)
     }
 
@@ -129,10 +136,11 @@ final class VolumeController: ObservableObject {
         engine.setGain(isMuted ? 0 : Self.gain(for: volume))
     }
 
-    /// Maps the 0...1 slider onto linear gain along a decibel curve, which is how a volume knob feels.
+    /// Maps the 0...1 slider onto linear gain with a power-law taper, which is how a volume knob feels.
+    /// 1.0 is unity: the signal passes through untouched.
     static func gain(for value: Float) -> Float {
         guard value > 0 else { return 0 }
-        return pow(10, (value - 1) * rangeDB / 20)
+        return pow(value, taper)
     }
 
     // MARK: Keys

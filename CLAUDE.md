@@ -21,7 +21,7 @@ scaling it, and playing it back out. Personal project, single user, no App Store
 - `Sources/Gainsayer/Audio/TapEngine.swift`: tap + aggregate device + IO callback.
 - `Sources/Gainsayer/Input/MediaKeyMonitor.swift`: CGEventTap for the volume keys.
 - `Sources/Gainsayer/VolumeController.swift`: state, device tracking, engage/disengage.
-- `Sources/Gainsayer/UI/`: SwiftUI menu bar UI.
+- `Sources/Gainsayer/UI/`: SwiftUI menu bar UI and the floating volume HUD.
 - `Support/Info.plist`: bundle metadata and the audio capture usage string.
 - `scripts/build-app.sh`: assembles and signs `build/Gainsayer.app`.
 

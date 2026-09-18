@@ -59,7 +59,7 @@ The build script picks it up automatically. To use a different identity, set `SI
 
 ## Roadmap
 
-- [ ] First run against real hardware and confirm the audio path
-- [ ] Volume bezel HUD to match the system one
+- [x] First run against real hardware and confirm the audio path
+- [x] Volume bezel HUD to match the system one
 - [ ] Launch at login
 - [ ] Homebrew tap for install and updates

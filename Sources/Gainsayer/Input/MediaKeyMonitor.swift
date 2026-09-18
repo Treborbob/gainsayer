@@ -14,8 +14,9 @@ final class MediaKeyMonitor {
 
     /// Return true to take the key. Called on the main run loop, keep it quick.
     var shouldIntercept: () -> Bool = { false }
-    /// Called for each key-down (including auto-repeat) that was intercepted.
-    var onKey: (Key) -> Void = { _ in }
+    /// Called for each key-down (including auto-repeat) that was intercepted. `fine` is true when
+    /// Shift+Option is held, which macOS treats as a quarter-step nudge.
+    var onKey: (Key, _ fine: Bool) -> Void = { _, _ in }
 
     private var port: CFMachPort?
     private var source: CFRunLoopSource?
@@ -91,7 +92,10 @@ final class MediaKeyMonitor {
         }
 
         guard shouldIntercept() else { return passThrough }
-        if isKeyDown { onKey(key) }
+        if isKeyDown {
+            let fine = nsEvent.modifierFlags.isSuperset(of: [.shift, .option])
+            onKey(key, fine)
+        }
         return nil // swallow both down and up so macOS does not also act on it
     }
 }
