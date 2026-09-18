@@ -44,8 +44,8 @@ work for any device in the same situation, but it will never grow into an audio 
 
 ## How it works
 
-Gainsayer lives in the menu bar. Click it for the device name, a slider, a mute button and a
-launch-at-login toggle. While it is engaged the keyboard keys drive the same level, in 32 steps, and
+Gainsayer lives in the menu bar. Click it for the device name, a slider, a mute button, a
+launch-at-login toggle and an About box. While it is engaged the keyboard keys drive the same level, in 32 steps, and
 each press shows the bezel.
 
 Under the hood there are three parts.
@@ -102,7 +102,7 @@ Create a stable self-signed identity so you are not re-granting permissions afte
 The build script uses it automatically. It does not need to be trusted. The first build prompts for
 keychain access; choose Always Allow.
 
-A Homebrew tap for install and updates is on the list.
+Updating is the same command again: it quits the running copy, replaces it, and relaunches.
 
 ## Project layout
 
@@ -153,7 +153,7 @@ Gainsayer is a personal project and I'm the only one working on it. Forks are ve
 are bug reports via issues, but I'm not accepting pull requests. If you want to take it somewhere,
 fork it and make it yours. See [CONTRIBUTING.md](CONTRIBUTING.md) if you're setting up a fork.
 
-Things on the maybe-later list: a Homebrew tap, per-device volume memory, a finer taper setting.
+Things on the maybe-later list: per-device volume memory, a finer taper setting.
 
 ## Licence
 

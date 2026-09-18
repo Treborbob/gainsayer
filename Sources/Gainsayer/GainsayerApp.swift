@@ -18,6 +18,13 @@ struct GainsayerApp: App {
             Image(systemName: controller.menuBarSymbol)
         }
         .menuBarExtraStyle(.window)
+
+        Window("About Gainsayer", id: AboutView.windowID) {
+            AboutView()
+        }
+        .windowStyle(.hiddenTitleBar)
+        .windowResizability(.contentSize)
+        .defaultPosition(.center)
     }
 
     /// Two instances would both tap the system audio and fight over the output. Yield to the first.

@@ -2,6 +2,7 @@ import SwiftUI
 
 struct MenuView: View {
     @EnvironmentObject private var controller: VolumeController
+    @Environment(\.openWindow) private var openWindow
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -68,10 +69,18 @@ struct MenuView: View {
             )
             .toggleStyle(.checkbox)
 
-            Button("Quit Gainsayer") {
-                NSApplication.shared.terminate(nil)
+            HStack {
+                Button("About Gainsayer") {
+                    openWindow(id: AboutView.windowID)
+                    // Menu bar apps have no Dock presence, so the window needs a nudge to come forward.
+                    NSApp.activate()
+                }
+                Spacer()
+                Button("Quit") {
+                    NSApplication.shared.terminate(nil)
+                }
+                .keyboardShortcut("q")
             }
-            .keyboardShortcut("q")
         }
         .padding(12)
         .frame(width: 280)
