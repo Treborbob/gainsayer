@@ -1,5 +1,13 @@
 import CoreAudio
 import Foundation
+import os
+
+enum Log {
+    static let subsystem = "dev.robblack.gainsayer"
+    static let app = Logger(subsystem: subsystem, category: "app")
+    static let audio = Logger(subsystem: subsystem, category: "audio")
+    static let keys = Logger(subsystem: subsystem, category: "keys")
+}
 
 /// An error from a Core Audio HAL call, carrying the four-character status code.
 struct CoreAudioError: LocalizedError {

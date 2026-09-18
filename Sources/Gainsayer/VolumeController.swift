@@ -73,6 +73,7 @@ final class VolumeController: ObservableObject {
         }
         deviceName = AudioSystem.name(of: device)
         let needsUs = !AudioSystem.hasOutputVolumeControl(device)
+        Log.app.info("Default output is \(device) \(self.deviceName, privacy: .public); needs Gainsayer: \(needsUs)")
 
         if needsUs {
             if engagedDevice != device { engage(device) }
@@ -91,10 +92,12 @@ final class VolumeController: ObservableObject {
             applyGain()
         } catch {
             lastError = error.localizedDescription
+            Log.app.error("Could not engage: \(error.localizedDescription, privacy: .public)")
         }
     }
 
     private func disengage() {
+        if isEngaged { Log.app.info("Disengaging") }
         engine.stop()
         engagedDevice = nil
         isEngaged = false
@@ -105,6 +108,7 @@ final class VolumeController: ObservableObject {
     func setVolume(_ value: Float) {
         volume = min(max(value, 0), 1)
         isMuted = false
+        Log.app.debug("Volume set to \(self.volume)")
         UserDefaults.standard.set(volume, forKey: Self.volumeKey)
         applyGain()
     }
@@ -117,6 +121,7 @@ final class VolumeController: ObservableObject {
 
     func toggleMute() {
         isMuted.toggle()
+        Log.app.debug("Mute \(self.isMuted)")
         applyGain()
     }
 
@@ -135,12 +140,14 @@ final class VolumeController: ObservableObject {
     private func startKeyMonitor(prompt: Bool) {
         accessibilityGranted = MediaKeyMonitor.isTrusted(prompt: prompt)
         if accessibilityGranted, keys.start() {
+            Log.keys.info("Media key monitor running")
             accessibilityRetry?.invalidate()
             accessibilityRetry = nil
             return
         }
         // Not granted yet. Poll quietly until the user flips the switch in System Settings.
         if accessibilityRetry == nil {
+            Log.keys.info("Accessibility not granted (trusted=\(self.accessibilityGranted)); will retry")
             accessibilityRetry = Timer.scheduledTimer(withTimeInterval: 3, repeats: true) { [weak self] _ in
                 MainActor.assumeIsolated { self?.startKeyMonitor(prompt: false) }
             }
